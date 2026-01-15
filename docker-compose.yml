@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: tekton-postgres
+    platform: linux/arm64  # Optimizado para Mac M3
+    environment:
+      POSTGRES_DB: tekton_db
+      POSTGRES_USER: tekton_user
+      POSTGRES_PASSWORD: tekton_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tekton_user -d tekton_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tekton-network
+    restart: unless-stopped
+
+  # Aplicación Spring Boot
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tekton-backend
+    platform: linux/arm64  # Optimizado para Mac M3
+    environment:
+      # Database - se sobrescriben desde variables de entorno
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tekton_db
+      SPRING_DATASOURCE_USERNAME: tekton_user
+      SPRING_DATASOURCE_PASSWORD: tekton_password
+      # JPA
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+      # External Service (Mock)
+      EXTERNAL_SERVICE_PERCENTAGE_URL: http://host.docker.internal:8081/api/percentage
+      EXTERNAL_SERVICE_PERCENTAGE_TIMEOUT: 5000
+      EXTERNAL_SERVICE_PERCENTAGE_MOCK_VALUE: 10.5
+      # Logging (opcional, para producción usar INFO)
+      LOG_LEVEL_COM_TEKTON: INFO
+      LOG_LEVEL_HIBERNATE_SQL: WARN
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tekton-network
+    restart: unless-stopped
+    healthcheck:
+      # Verificar que el contenedor responda (se puede cambiar a /actuator/health si se agrega Actuator)
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api-docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  tekton-network:
+    driver: bridge

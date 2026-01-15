@@ -3,15 +3,15 @@ spring:
     name: backend
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/tekton_db
-    username: tekton_user
-    password: tekton_password
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tekton_db}
+    username: ${SPRING_DATASOURCE_USERNAME:tekton_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:tekton_password}
     driver-class-name: org.postgresql.Driver
   
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -35,9 +35,9 @@ async:
 external:
   service:
     percentage:
-      url: http://localhost:8081/api/percentage
-      timeout: 5000
-      mock-value: 10.5  # Valor fijo para el mock
+      url: ${EXTERNAL_SERVICE_PERCENTAGE_URL:http://localhost:8081/api/percentage}
+      timeout: ${EXTERNAL_SERVICE_PERCENTAGE_TIMEOUT:5000}
+      mock-value: ${EXTERNAL_SERVICE_PERCENTAGE_MOCK_VALUE:10.5}
 
 # Swagger/OpenAPI
 springdoc:
@@ -50,6 +50,6 @@ springdoc:
 # Logging
 logging:
   level:
-    com.tekton.backend: DEBUG
-    org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
+    com.tekton.backend: ${LOG_LEVEL_COM_TEKTON:DEBUG}
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:INFO}
+    org.hibernate.SQL: ${LOG_LEVEL_HIBERNATE_SQL:DEBUG}
