@@ -31,13 +31,21 @@ async:
     queue-capacity: 100
     thread-name-prefix: api-history-
 
-# Configuración del servicio externo (mock)
+# Configuración del servicio externo
 external:
   service:
     percentage:
       url: ${EXTERNAL_SERVICE_PERCENTAGE_URL:http://localhost:8081/api/percentage}
       timeout: ${EXTERNAL_SERVICE_PERCENTAGE_TIMEOUT:5000}
-      mock-value: ${EXTERNAL_SERVICE_PERCENTAGE_MOCK_VALUE:10.5}
+
+# Configuración de Feign
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
 
 # Swagger/OpenAPI
 springdoc:
