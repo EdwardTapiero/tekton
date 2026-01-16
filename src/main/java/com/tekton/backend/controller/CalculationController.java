@@ -5,6 +5,7 @@ import com.tekton.backend.dto.CalculationRequest;
 import com.tekton.backend.dto.CalculationResponse;
 import com.tekton.backend.service.CalculationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,24 @@ public class CalculationController {
 
     @Operation(
         summary = "Calcular con porcentaje dinámico",
-        description = "Suma num1 y num2, y aplica un porcentaje adicional obtenido del servicio externo"
+        description = "Suma num1 y num2, y aplica un porcentaje adicional obtenido del servicio externo. " +
+                      "El porcentaje se obtiene del servicio externo configurado. Si el servicio falla, " +
+                      "se usa el último valor almacenado en caché (válido por 30 minutos). Si no hay caché, " +
+                      "se retorna un error 503.",
+        responses = {
+            @ApiResponse(
+                responseCode = "200",
+                description = "Cálculo exitoso"
+            ),
+            @ApiResponse(
+                responseCode = "400",
+                description = "Error de validación en los datos de entrada"
+            ),
+            @ApiResponse(
+                responseCode = "503",
+                description = "Servicio externo no disponible y no hay valor en caché"
+            )
+        }
     )
     @PostMapping
     @LogApiCall
