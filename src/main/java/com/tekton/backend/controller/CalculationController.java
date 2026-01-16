@@ -1,5 +1,6 @@
 package com.tekton.backend.controller;
 
+import com.tekton.backend.aspect.LogApiCall;
 import com.tekton.backend.dto.CalculationRequest;
 import com.tekton.backend.dto.CalculationResponse;
 import com.tekton.backend.service.CalculationService;
@@ -30,6 +31,7 @@ public class CalculationController {
         description = "Suma num1 y num2, y aplica un porcentaje adicional obtenido del servicio externo"
     )
     @PostMapping
+    @LogApiCall
     public ResponseEntity<CalculationResponse> calculate(@Valid @RequestBody CalculationRequest request) {
         CalculationResponse response = calculationService.calculate(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
