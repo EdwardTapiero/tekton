@@ -1,0 +1,113 @@
+{
+	"info": {
+		"_postman_id": "09ea7b91-a1d8-4cb1-a784-b4f7923bfcb9",
+		"name": "Tekton",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10404051",
+		"_collection_link": "https://gold-shuttle-500675.postman.co/workspace/My-Workspace~71a898f2-0adf-4681-8f7e-08fd6f3c839c/collection/10404051-09ea7b91-a1d8-4cb1-a784-b4f7923bfcb9?action=share&source=collection_link&creator=10404051"
+	},
+	"item": [
+		{
+			"name": "Calculate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"num1\": 10.5,\n    \"num2\": 20.3\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/calculate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtención de historial paginado",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/history?page=0&size=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"history"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtención de historial paginado filtrado por fecha",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/history?startDate=2024-01-15&endDate=2024-01-16&page=0&size=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"history"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2024-01-15"
+						},
+						{
+							"key": "endDate",
+							"value": "2024-01-16"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

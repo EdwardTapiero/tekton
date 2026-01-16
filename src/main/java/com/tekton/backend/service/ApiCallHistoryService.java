@@ -3,16 +3,20 @@ package com.tekton.backend.service;
 import com.tekton.backend.dto.ApiCallHistoryResponse;
 import com.tekton.backend.entity.ApiCallHistory;
 import com.tekton.backend.repository.ApiCallHistoryRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Servicio para gestionar el historial de llamadas.
@@ -57,12 +61,35 @@ public class ApiCallHistoryService {
      * @return Página de historial de llamadas
      */
     public Page<ApiCallHistoryResponse> getHistory(String endpoint, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
-        LocalDateTime endDateTime = endDate != null ? endDate.atTime(LocalTime.MAX) : null;
-
-        Page<ApiCallHistory> historyPage = repository.findByFilters(endpoint, startDateTime, endDateTime, pageable);
+        Specification<ApiCallHistory> spec = buildSpecification(endpoint, startDate, endDate);
+        Page<ApiCallHistory> historyPage = repository.findAll(spec, pageable);
         
         return historyPage.map(this::toResponse);
+    }
+
+    /**
+     * Construye la especificación para los filtros dinámicos.
+     */
+    private Specification<ApiCallHistory> buildSpecification(String endpoint, LocalDate startDate, LocalDate endDate) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (endpoint != null && !endpoint.isEmpty()) {
+                predicates.add(cb.equal(root.get("endpoint"), endpoint));
+            }
+
+            if (startDate != null) {
+                LocalDateTime startDateTime = startDate.atStartOfDay();
+                predicates.add(cb.greaterThanOrEqualTo(root.get("timestamp"), startDateTime));
+            }
+
+            if (endDate != null) {
+                LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+                predicates.add(cb.lessThanOrEqualTo(root.get("timestamp"), endDateTime));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     /**

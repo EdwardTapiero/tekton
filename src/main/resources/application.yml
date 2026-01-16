@@ -35,7 +35,7 @@ async:
 external:
   service:
     percentage:
-      url: ${EXTERNAL_SERVICE_PERCENTAGE_URL:http://localhost:8081/api/percentage}
+      url: ${EXTERNAL_SERVICE_PERCENTAGE_URL:http://localhost:8085/api/percentage}
       timeout: ${EXTERNAL_SERVICE_PERCENTAGE_TIMEOUT:5000}
 
 
